@@ -35,13 +35,14 @@
   <div class="header2">
     <h1 class="hero-title"><strong>Nothing to do? List</strong></h1>
   </div>
+  <div class="welcome-banner" style="width:100%;max-width:1160px;margin:0 auto .5rem auto;text-align:center;">
+    <p style="margin:.25rem 0;font-weight:600;color:#000;">Welcome, <span id="welcome-name">User</span></p>
+  </div>
+
   <!-- Sync control row -->
   <div style="max-width:1160px;margin:0 auto .25rem auto;display:flex;justify-content:flex-end;gap:.5rem;align-items:center;">
     <button id="sync-btn" class="btn" style="padding:.35rem .6rem;border-radius:10px;">Sync</button>
     <span id="sync-status" style="font-size:.85rem;opacity:.7;"></span>
-  </div>
-  <div class="welcome-banner" style="width:100%;max-width:1160px;margin:0 auto .5rem auto;text-align:center;">
-    <p style="margin:.25rem 0;font-weight:600;color:#000;">Welcome, <span id="welcome-name">User</span></p>
   </div>
 
   <div class="twocol">
@@ -94,21 +95,24 @@
 
     function setSyncStatus(msg){ if(syncStatus) syncStatus.textContent = msg; }
 
-    // ===== Fetch tasks from Google Sheets (no preflight) =====
-    async function fetchTasks(){
-      const url = new URL(TASKS_API_URL);
-      url.searchParams.set('business', businessFile);
-      url.searchParams.set('key', TASKS_SECRET);   // secret in query to avoid preflight
-      url.searchParams.set('_', Date.now());       // cache-bust
-      const res = await fetch(url.toString(), {
-        cache: 'no-store',
-        mode: 'cors',
-        credentials: 'omit'
+    // ===== JSONP loader (no CORS needed) =====
+    function fetchTasksJSONP(){
+      return new Promise((resolve, reject) => {
+        const cbName = 'tasks_cb_' + Math.random().toString(36).slice(2);
+        window[cbName] = (resp) => {
+          try { resolve((resp && resp.tasks) || []); }
+          finally { delete window[cbName]; script.remove(); }
+        };
+        const url = new URL(TASKS_API_URL);
+        url.searchParams.set('business', businessFile);
+        url.searchParams.set('key', TASKS_SECRET);
+        url.searchParams.set('callback', cbName);
+        url.searchParams.set('_', Date.now()); // cache-bust
+        const script = document.createElement('script');
+        script.src = url.toString();
+        script.onerror = () => { delete window[cbName]; script.remove(); reject(new Error('JSONP failed')); };
+        document.head.appendChild(script);
       });
-      if (!res.ok) throw new Error('tasks fetch failed');
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.error || 'bad response');
-      return data.tasks || [];
     }
 
     function cacheTasks(tasks){
@@ -238,7 +242,7 @@
     async function init(){
       try {
         setSyncStatus('Loading…');
-        const tasks = await fetchTasks();
+        const tasks = await fetchTasksJSONP();
         tasksForBiz = tasks.map(t => ({...t, days: Number(t.days)||7}));
         cacheTasks(tasksForBiz);
         setSyncStatus('');
@@ -264,7 +268,7 @@
     async function refreshTasks(){
       try{
         setSyncStatus('Syncing…');
-        const tasks = await fetchTasks();
+        const tasks = await fetchTasksJSONP();
         tasksForBiz = tasks.map(t => ({...t, days: Number(t.days)||7}));
         cacheTasks(tasksForBiz);
         Object.keys(nodes).forEach(k => delete nodes[k]);
@@ -293,7 +297,7 @@
       if (document.visibilityState === 'visible') refreshTasks();
     });
 
-    // Logging to sheet (POST ?key=... + text/plain to avoid preflight)
+    // Logging to sheet (POST ?key=... + text/plain, no-cors → no CORS issues)
     async function logToSheets(payload){
       if (!SHEETS_WEB_APP_URL) return;
       try {
@@ -303,7 +307,7 @@
           method:'POST',
           headers:{ 'Content-Type':'text/plain' },
           body: JSON.stringify(payload),
-          mode:'cors',
+          mode:'no-cors',
           keepalive:true,
           credentials:'omit'
         });
