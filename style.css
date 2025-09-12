@@ -1,0 +1,665 @@
+/* ✅ style.css - Elegant + Fully Mobile-Responsive with Comments */
+
+/* --- Global Styles --- */
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background: #eedc9a;
+  color: #f9f9f9;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 1rem;
+  text-align: center;
+  overflow-x: hidden; /* Prevent side scroll */
+}
+
+/* 🔵 Main Header Bar */
+.main-header {
+  /* width: 100%; */
+  /* background: #0f172a; Dark royal navy */
+  color: #9e1818;       /* Royal gold */
+  padding: 1rem 0.5rem;
+  text-align: center;
+  /* box-shadow: 0 2px 4px rgba(0,0,0,0.4); */
+}
+
+.main-header h1 {
+  margin: 0;
+  font-size: 3rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+}
+
+.main-header h1 span {
+  color: #ffffff;
+  font-weight: 400;
+}
+
+/* 🔵 Login Only Page Layout */
+body.login-only {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 2rem;
+}
+
+/* 🔵 Login Box Styling */
+.login-box {
+  background: #1c2238;
+  padding: 1.5rem;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 340px;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.5);
+  border: 1px solid #2d3250;
+  margin: 2rem auto;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.login-box input,
+.login-box button {
+  width: 90%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;   /* <-- This adds spacing between inputs */
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.login-box button {
+  width: 70%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;   /* <-- This adds spacing between inputs */
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.login-box button {
+  background: #d4af37;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-box button:hover {
+  transform: scale(1.03);
+}
+
+#error-msg {
+  color: red;
+  font-size: 0.9rem;
+  animation: shake 0.4s ease-in-out;
+}
+
+/* 🔵 Header Styling */
+.header {
+  /* background: #1c2238; */
+  padding: 1rem 0.5rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid #2d3250;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  font-family: 'Montserrat', sans-serif;
+  color: #d4af37;
+  margin: 0;
+}
+
+.header img {
+  width: 50%;
+  height: 20%;
+  object-fit: center;
+  border-radius: 20%;
+}
+
+.header1 {
+  /* background: #1c2238; */
+  padding: 1rem 0.5rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid #2d3250;
+}
+.header1 img {
+  width: 25%;
+  height: 20%;
+  object-fit: center;
+  border-radius: 20%;
+}
+
+.header2 {
+  /* background: #1c2238; */
+  padding: 1rem 0.5rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid #2d3250;
+}
+.header2 img {
+  width: 50%;
+  height: 20%;
+  object-fit: center;
+  border-radius: 20%;
+}
+
+/* 🔵 Dashboard Container */
+.form-dashboard {
+  padding: 1rem;
+  background: #6f8a88;
+  text-align: center;
+  flex-grow: 1;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* 🔵 Form Grid Layout */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* 🔵 Individual Form Button Styling */
+.form-card {
+  background: #1c2238;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #f9f9f9;
+  border: 1px solid #2d3250;
+  transition: 0.3s;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.form-card:hover {
+  border-color: #d4af37;
+  transform: scale(1.02);
+}
+
+.form-card i {
+  color: #d4af37;
+  font-size: 1.1rem;
+}
+
+/* 🔵 Location Buttons (Admin) */
+.location-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.location-buttons button {
+  background: #d4af37;
+  color: #000;
+  font-weight: 600;
+  border: none;
+  padding: 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* 🔵 Logout Button Styling */
+.logout {
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.logout button {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  background: #d4af37;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.logout button:hover {
+  transform: scale(1.05);
+}
+
+/* 🔵 Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+
+/* 🎉 Greeting Popup */
+.popup {
+  background: #1c2238;
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  color: #f9f9f9;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  animation: fadeIn 0.4s ease;
+}
+
+.popup h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #d4af37;
+}
+
+.popup p {
+  font-size: 1rem;
+  margin: 0.5rem 0;
+}
+
+.popup .quote {
+  font-style: italic;
+  margin: 1rem 0;
+  color: #ffffff;
+}
+
+.ok-btn {
+  padding: 0.6rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  background: #d4af37;
+  color: #000;
+  font-weight: bold;
+  font-size: 1rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.ok-btn:hover {
+  transform: scale(1.05);
+}
+
+.expiry-tab {
+  background: #1c2238;
+  color: #d4af37;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+.expiry-tab strong {
+  color: #ffffff;
+}
+
+.disposal-alerts {
+  background: #ffeded;
+  color: #d8000c;
+  padding: 1rem;
+  border-left: 6px solid #d8000c;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.disposal-alerts span {
+  color: #000;
+}
+
+#reminder-code {
+  font-weight: bold;
+  color: black;
+}
+
+
+/* 🔵 Mobile Optimisation */
+@media (max-width: 480px) {
+  body {
+    padding: 0.5rem;
+    align-items: stretch;
+  }
+
+  .main-header h1 {
+    margin: 0;
+    font-size: 2rem;
+    /* font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.6); */
+  }
+
+  body.login-only {
+    padding: 1rem;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .login-box {
+    width: 100%;
+    max-width: 100%;
+    margin: 2rem auto;
+    padding: 1.5rem 1rem;
+    box-sizing: border-box;
+    border-radius: 12px;
+  }
+
+  .login-box input,
+  .login-box button {
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+
+  .login-box button {
+    width: 100%;
+  }
+
+  .header h1 {
+    font-size: 1.4rem;
+    text-align: center;
+    padding: 0 1rem;
+  }
+
+  .form-dashboard {
+    padding: 1rem;
+  }
+
+  .form-grid {
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .form-card {
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .location-buttons button {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .disposal-alerts {
+    max-width: 500px;
+    font-size: 1.05rem;
+  }
+
+  .logout button {
+    margin-top: 10px;
+    width: 40%;
+  }
+}
+
+.disposal-wrapper {
+  max-width: 600px;
+  margin: 1rem auto;
+}
+.disposal-card {
+  background: #1c2238;
+  padding: 1.5rem;
+  color: #fff;
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+.disposal-card span {
+  color: #d4af37;
+}
+.disposal-alerts {
+  background: #ffeded;
+  border-left: 6px solid red;
+  color: #d8000c;
+  padding: 1rem;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.disposal-alerts span {
+  color: black;
+}
+
+.tab-buttons-section {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      max-width: 400px;
+      margin: 1.5rem auto;
+    }
+    .tab-buttons-section button {
+      background: #d4af37;
+      color: #000;
+      font-weight: bold;
+      font-size: 1rem;
+      padding: 1rem;
+      border: none;
+      border-radius: 12px;
+      height: 100px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .tab-buttons-section button.active {
+      background: #1e90ff;
+      color: #fff;
+    }
+    .tab-buttons-wrapper {
+      display: none;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding: 0.5rem 1rem;
+      box-sizing: border-box;
+      scrollbar-width: none;
+    }
+    .tab-buttons-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+    .tab-buttons {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .tab-buttons button {
+      background: #d4af37;
+      color: #000;
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 10px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .tab-buttons button.active {
+      background: #1e90ff;
+      color: #fff;
+    }
+    .tab-content {
+      display: none;
+      margin-top: 1.5rem;
+    }
+    .tab-content.active {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.5rem;
+      justify-content: center;
+    }
+    .grid-card {
+      background: #fff;
+      color: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      text-align: center;
+      padding: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      cursor: pointer;
+      transition: 0.2s;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      line-height: 1;
+    }
+    .grid-card:hover {
+      transform: scale(1.03);
+    }
+    .grid-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 0rem;
+      display: block;
+      display: block;
+      margin: 0 auto;
+      padding: 0;
+      line-height: 0;
+      border: none;
+      box-sizing: border-box;
+    }
+    .grid-card-title {
+      margin-top: 0rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+      .tab-buttons-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        max-width: 90%;
+      }
+      .tab-buttons-section button {
+        height: auto;
+      }
+      .tab-content.active {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      }
+    }
+
+
+/* === Hub Tweaks: Tiles -> Tabs + PIN Modal === */
+#top-tabs { display: none; }
+body.tiles-hidden #top-tabs { display: block; }
+#main-section-buttons { display: block; }
+body.tiles-hidden #main-section-buttons { display: none !important; }
+
+/* 6 big home tiles */
+.home-tiles-6 {
+  max-width: 1160px;
+  margin: 1rem auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 340px));
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* PIN modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.modal-backdrop.open { display: flex; }
+.modal-card {
+  background: #f5f5f5;
+  color: #000;
+  border-radius: 16px;
+  padding: 1rem;
+  width: min(420px, 92vw);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  text-align: left;
+}
+.modal-card h3 { margin: .25rem 0 .5rem 0; text-align: center; }
+.modal-card p { margin: 0 0 .75rem 0; text-align: center; }
+.modal-card input[type="password"]{
+  width: 100%;
+  font-size: 1.05rem;
+  padding: .65rem .75rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  outline: none;
+  box-sizing: border-box;
+}
+.modal-actions{
+  display: flex; gap: .5rem; justify-content: center; margin-top: .75rem;
+}
+.modal-actions .btn{
+  background: #d4af37; color: #000; font-weight: 700; border: none; border-radius: 10px; padding: .6rem 1rem; cursor: pointer;
+}
+.modal-actions .btn.secondary{
+  background: #e0e0e0; color: #000;
+}
+
+
+/* === Home tiles: force 3 columns desktop, responsive === */
+.home-tiles-6{
+  width:100%;
+  max-width:1160px;
+  margin:1rem auto;
+  display:grid !important;
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+  gap:1rem;
+  justify-content:center;
+  align-content:start;
+}
+.home-tiles-6 .grid-card{ display:block; }
+@media (max-width: 980px){
+  .home-tiles-6{ grid-template-columns: repeat(2, minmax(240px, 1fr)); }
+}
+@media (max-width: 560px){
+  .home-tiles-6{ grid-template-columns: 1fr; }
+}
+
+
+/* === Simple 3x2 name-only tiles (gold buttons) === */
+.home-tiles-6{
+  width:100%;
+  max-width:1160px;
+  margin:1rem auto;
+  display:grid !important;
+  grid-template-columns: repeat(3, minmax(240px, 1fr));
+  gap:1rem;
+  justify-content:center;
+}
+.home-tiles-6 .tile-btn{
+  height:120px;
+  background:#d4af37; /* existing gold */
+  color:#000;
+  font-weight:700;
+  font-size:1.1rem;
+  border:none;
+  border-radius:16px;
+  cursor:pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,.15);
+}
+.home-tiles-6 .tile-btn:active{ transform:scale(.98); }
+@media (max-width: 980px){
+  .home-tiles-6{ grid-template-columns: repeat(2, minmax(220px, 1fr)); }
+}
+@media (max-width: 560px){
+  .home-tiles-6{ grid-template-columns: 1fr; }
+}

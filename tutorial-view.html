@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutorial</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    .tutorial-wrap{max-width:980px;margin:1rem auto;display:flex;flex-direction:column;align-items:center;gap:1rem;padding:0 .75rem;}
+    .video-frame, .pdf-frame{width:100%; min-height: 56.25vw; max-height: 560px; border:0; border-radius:12px;}
+    @media (min-width: 900px){ .video-frame, .pdf-frame{min-height: 560px;} }
+    .cta{display:inline-block;padding:.75rem 1rem;border-radius:10px;background:#d4af37;color:#000;font-weight:700;text-decoration:none;}
+    .title{margin:.25rem 0;color:#000}
+  </style>
+</head>
+<body class="form-dashboard" style="display:none">
+  <div class="header2">
+    <h1 class="hero-title">Tutorial</h1>
+  </div>
+  <div class="welcome-banner" style="width:100%;max-width:1160px;margin:0 auto 0.5rem auto;text-align:center;">
+    <p style="margin:.25rem 0;font-weight:600;color:#000;">Welcome, <span id="welcome-name">User</span></p>
+  </div>
+  <div class="tutorial-wrap">
+    <h2 class="title" id="ttl">Tutorial</h2>
+    <div id="videoSlot"></div>
+    <div id="pdfSlot"></div>
+    <div id="ctaSlot"></div>
+  </div>
+
+  <div class="logout"><button id="logout-btn">Logout</button></div>
+
+  <script>
+    (function(){
+      if (!sessionStorage.getItem('loggedIn')) { document.body.style.display='none'; window.location.href='index.html'; return; }
+      document.body.style.display='block';
+      const n = sessionStorage.getItem('userName') || 'User';
+      document.getElementById('welcome-name').textContent = n;
+    })();
+    const Q = new URLSearchParams(location.search);
+    const title = Q.get('title') || 'Tutorial';
+    const video = Q.get('video'); // e.g., YouTube embed URL or MP4
+    const pdf = Q.get('pdf');
+
+    document.getElementById('ttl').textContent = title;
+
+    if (video){
+      // Centered video
+      const v = document.createElement('iframe');
+      v.className = 'video-frame';
+      v.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      v.allowFullscreen = true;
+      v.src = video;
+      document.getElementById('videoSlot').appendChild(v);
+    }
+
+    if (pdf){
+      const p = document.createElement('iframe');
+      p.className = 'pdf-frame';
+      p.src = pdf;
+      document.getElementById('pdfSlot').appendChild(p);
+
+      const a = document.createElement('a');
+      a.href = pdf; a.target = '_blank'; a.className = 'cta';
+      a.innerHTML = '<i class="fa-solid fa-file-pdf"></i> Read PDF';
+      document.getElementById('ctaSlot').appendChild(a);
+    }
+
+    document.getElementById('logout-btn').addEventListener('click', ()=>{ 
+      sessionStorage.clear(); window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

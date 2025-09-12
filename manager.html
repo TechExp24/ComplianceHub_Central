@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manager Area</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="form-dashboard" style="display:none">
+  <div class="header2">
+    <h1 class="hero-title"><strong>Manager</strong> – Compliance Hub</h1>
+  </div>
+  
+  <!-- Welcome banner -->
+  <div class="welcome-banner" style="width:100%;max-width:1160px;margin:0 auto 0.5rem auto;text-align:center;">
+    <p style="margin:.25rem 0;font-weight:600;color:#000;">Welcome, <span id="welcome-name">User</span></p>
+  </div>
+  <script>
+    (function(){
+      const n = sessionStorage.getItem('userName') || 'User';
+      document.getElementById('welcome-name').textContent = n;
+    })();
+  </script>
+
+  <div class="login-box" id="pin-box" style="max-width:420px;margin:0 auto;">
+    <h2>Enter Manager PIN</h2>
+    <form onsubmit="return checkPin(event)">
+      <input type="password" id="pin" placeholder="Manager PIN" required />
+      <button type="submit"><i class="fa-solid fa-lock"></i> Unlock</button>
+      <p id="pin-error" style="color:#b00020;font-weight:600;"></p>
+    </form>
+  </div>
+
+  <div id="manager-content" style="display:none">
+    <div class="tab-buttons-section" style="max-width:800px;margin:1rem auto;">
+      <button onclick="document.getElementById('manager-tiles').scrollIntoView({behavior:'smooth'})"><i class="fa-solid fa-table-cells"></i> Manager Tiles</button>
+      <a class="button-like" href="index.html" style="text-decoration:none"><i class="fa-solid fa-arrow-left"></i> Back to Login</a>
+    </div>
+
+    <div id="manager-tiles" class="tab-content active" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,340px));justify-content:center;gap:1rem;max-width:1160px;margin:0 auto;">
+      <!-- Use existing grid-card style -->
+      <a href="ricks-diner.html" class="grid-card">
+        <img src="images/ricks.jpeg" alt="Rick's Diner"><div class="grid-card-title">Rick's Diner Dashboard</div>
+      </a>
+      <a href="phillys-stclements.html" class="grid-card">
+        <img src="images/phillys.png" alt="Philly's St Clements"><div class="grid-card-title">Philly's – St Clements</div>
+      </a>
+      <a href="phillys-cowley.html" class="grid-card">
+        <img src="images/phillys.png" alt="Philly's Cowley"><div class="grid-card-title">Philly's – Cowley</div>
+      </a>
+      <a href="stclaire-valentine.html" class="grid-card">
+        <img src="images/saint.png" alt="St Claire"><div class="grid-card-title">St. Claire – Valentine</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="logout"><button id="logout-btn">Logout</button></div>
+
+  <script>
+    // Gate: require login first (reuse existing session check pattern)
+    (function(){ 
+      if (!sessionStorage.getItem('loggedIn')) { document.body.style.display='none'; window.location.href='index.html'; return; }
+      document.body.style.display='block';
+    })();
+
+    const MANAGER_PIN = "2468"; // TODO: change as needed
+
+    function checkPin(e){ 
+      e.preventDefault();
+      const val = document.getElementById('pin').value.trim();
+      const err = document.getElementById('pin-error');
+      if(val === MANAGER_PIN){ 
+        document.getElementById('pin-box').style.display='none';
+        document.getElementById('manager-content').style.display='block';
+        err.textContent='';
+      } else { 
+        err.textContent = "Incorrect PIN.";
+      }
+      return false;
+    }
+
+    // logout support uses disposal.js pattern; do a light inline fallback
+    document.getElementById('logout-btn').addEventListener('click', ()=>{ 
+      sessionStorage.removeItem('loggedIn');
+      sessionStorage.removeItem('userName');
+      sessionStorage.removeItem('userEmail');
+      sessionStorage.removeItem('userBusiness');
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

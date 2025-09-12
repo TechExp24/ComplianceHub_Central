@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Rick's Diner</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body style="display:none" class="form-dashboard">
+  <div class="header1">
+    <img src="images/ricks.jpeg" alt="Rick's Logo">
+  </div>
+
+  <!-- Welcome banner -->
+  <div class="welcome-banner" style="width:100%;max-width:1160px;margin:0 auto 0.5rem auto;text-align:center;">
+    <p style="margin:.25rem 0;font-weight:600;color:#000;">Welcome, <span id="welcome-name">User</span></p>
+  </div>
+  <script>
+    (function(){
+      const n = sessionStorage.getItem('userName') || 'User';
+      document.getElementById('welcome-name').textContent = n;
+    })();
+  </script>
+
+
+  
+  
+  <div id="main-section-buttons" class="home-tiles-6">
+    <button class="tile-btn" onclick="activateSection('daily')">Daily Forms</button>
+    <button class="tile-btn" onclick="activateSection('docs')">Important Documents</button>
+    <button class="tile-btn" onclick="activateSection('lessons')">Hygiene Lessons</button>
+    <button class="tile-btn" onclick="activateSection('certs')">Certificates</button>
+    <button class="tile-btn" onclick="pinGate('tutorials')">Tutorial Videos</button>
+    <button class="tile-btn" onclick="pinGate('auditor')">Auditor Forms</button>
+  </div>
+
+
+  <div class="tab-buttons-wrapper" id="top-tabs">
+    <div class="tab-buttons">
+      <button id="btn-daily" onclick="showTab('daily')">Daily Forms</button>
+      <button id="btn-docs" onclick="showTab('docs')">Important Documents</button>
+      <button id="btn-lessons" onclick="showTab('lessons')">Hygiene Lessons</button>
+      <button id="btn-certs" onclick="showTab('certs')">Certificates</button>
+          <button id="btn-tutorials" onclick="pinGate('tutorials')">Tutorial Videos</button>
+      <button id="btn-audit" onclick="pinGate('auditor')">Auditor Forms</button>
+    </div>
+  </div>
+
+  <div id="daily" class="tab-content">
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdpnjVgvGILWD-1y1ZevompQSIkJlcFSfSwOScgtxx2x8EMfw/viewform?usp=header" class="grid-card" target="_blank">
+      <img src="images/Fridge temperature.png" alt="Fridge Temperature Check">
+      <div class="grid-card-title">Fridge Temperature Check</div>
+    </a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLScA8Z2PnblP3OVguzmKbKJGAmJzyPvQzZ9EupYzDNkiEb2cog/viewform?usp=header" class="grid-card" target="_blank">
+      <img src="images/form-thumb.jpg" alt="Fridge Temperature Check">
+      <div class="grid-card-title">Chicken Temperature Record</div>
+    </a>
+    <a href="https://forms.gle/clean" class="grid-card" target="_blank">
+      <img src="images/form-thumb.jpg" alt="Cleaning Schedule">
+      <div class="grid-card-title">Cleaning Schedule</div>
+    </a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSf6745HWYbUr5QYEbAhCec2I9q1wVdmfvLWMmDyvMn479hJjg/viewform?usp=header" class="grid-card" target="_blank">
+      <img src="images/Opening_Checklist.png" alt="Opening Checklist">
+      <div class="grid-card-title">Opening Checklist - Kitchen</div>
+    </a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfgqymmVGo1ZEZBzLLxEh1iZIwWFeNk0CaL_IDmC4S2wJ0PHg/viewform?usp=header" class="grid-card" target="_blank">
+      <img src="images/Closing_Checklist.png" alt="Closing Checklist">
+      <div class="grid-card-title">Closing Checklist - Kitchen</div>
+    </a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeS8hf5Dry9uFMAei8uSfbd091ku2PEYI6rT29lqgsgvKdPng/viewform?usp=header" class="grid-card" target="_blank">
+      <img src="images/form-thumb.jpg" alt="Chicken Breading Station">
+      <div class="grid-card-title">Chicken Breading Station</div>
+    </a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdUmVpwII0XWN_VmbHZ2nQfJjnqjau7XUQoRVBtkHcV1ZeS7g/viewform" target="_blank" class="grid-card">
+      <img src="images/wastage_form.png"><div class="grid-card-title">Wastage Form</div>
+    </a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfnK5k-GEaYmmCHUOT4LRF88waAj7KPmnozibBdDVFiNRJB0A/viewform?usp=header" class="grid-card" target="_blank">
+      <img src="images/form-thumb.jpg" alt="Chicken Breading Station">
+      <div class="grid-card-title">Opening Checklist - Shop floor</div>
+    </a>
+    <a href="https://forms.gle/VzcYXxH1VGPZD3Bn9" class="grid-card" target="_blank">
+      <img src="images/Closing_Checklist.png" alt="Closing Checklist">
+      <div class="grid-card-title">Closing Checklist - Shop Floor</div>
+    </a>
+    <a class="grid-card" href="todo.html">
+      <img src="images/ricks.jpeg" alt="To Do List">
+      <div class="grid-card-title">To Do List (Quiet Time)</div>
+    </a>
+  </div>
+
+  <div id="docs" class="tab-content">
+    <a href="/images/sfbb-Ricks.pdf" target="_blank" class="grid-card">
+      <img src="images/sfbb_manual" alt="SFBB Manual">
+      <div class="grid-card-title">SFBB Manual</div>
+    </a>
+    <a href="#" target="_blank" class="grid-card">
+      <img src="images/doc-thumb.jpg" alt="Emergency Procedure">
+      <div class="grid-card-title">Emergency Procedure</div>
+    </a>
+    <a href= "/images/Grill Station & Food Prep Manual.pdf" target="_blank" class="grid-card">
+      <img src="images/doc-thumb.jpg" alt="Grill SOP">
+      <div class="grid-card-title">Grill SOP</div>
+    </a>
+  </div>
+
+  <div id="lessons" class="tab-content">
+    <a href="tutorial-view.html?title=How%20to%20Wash%20Hands&pdf=images/handwashing.pdf" target="_blank" class="grid-card">
+      <img src="images/video-thumb.jpg" alt="How to Wash Hands">
+      <div class="grid-card-title">How to Wash Hands</div>
+    </a>
+    <a href="/images/Hygiene_Training_Manual1.pdf" target="_blank" class="grid-card">
+      <img src="images/video-thumb.jpg" alt="Clean the Grill">
+      <div class="grid-card-title">Hygiene Training Manual</div>
+    </a>
+    <a href="/images/crosscontamination.pdf" target="_blank" class="grid-card">
+      <img src="images/video-thumb.jpg" alt="Avoid Cross Contamination">
+      <div class="grid-card-title">Avoid Cross Contamination</div>
+    </a>
+  </div>
+
+<!--   <div id="certs" class="tab-content">
+    <a href="#" target="_blank" class="grid-card">
+      <img src="images/cert-thumb.jpg" alt="Level 2 Hygiene">
+      <div class="grid-card-title">Level 2 Hygiene Certificate</div>
+    </a>
+    <a href="#" target="_blank" class="grid-card">
+      <img src="images/cert-thumb.jpg" alt="Food Safety Awareness">
+      <div class="grid-card-title">Food Safety Awareness</div>
+    </a>
+  </div> -->
+
+  <div class="logout">
+    <button id="logout-btn">Logout</button>
+  </div>
+
+  
+  <script src="disposal.js" defer></script>
+</body>
+</html>

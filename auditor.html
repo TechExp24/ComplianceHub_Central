@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auditor Access</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="form-dashboard" style="display:none">
+  <div class="header2">
+    <h1 class="hero-title"><strong>Auditor</strong> – Compliance Hub</h1>
+  </div>
+  
+  <!-- Welcome banner -->
+  <div class="welcome-banner" style="width:100%;max-width:1160px;margin:0 auto 0.5rem auto;text-align:center;">
+    <p style="margin:.25rem 0;font-weight:600;color:#000;">Welcome, <span id="welcome-name">User</span></p>
+  </div>
+  <script>
+    (function(){
+      const n = sessionStorage.getItem('userName') || 'User';
+      document.getElementById('welcome-name').textContent = n;
+    })();
+  </script>
+
+  <div class="login-box" id="apin-box" style="max-width:420px;margin:0 auto;">
+    <h2>Enter Auditor PIN</h2>
+    <form onsubmit="return checkAPin(event)">
+      <input type="password" id="apin" placeholder="Auditor PIN" required />
+      <button type="submit"><i class="fa-solid fa-user-shield"></i> Unlock</button>
+      <p id="apin-error" style="color:#b00020;font-weight:600;"></p>
+    </form>
+  </div>
+
+  <div id="auditor-sites" style="display:none">
+    <h3 style="margin:.5rem 0;">Select Location to Audit</h3>
+    <div class="tab-content active" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,340px));justify-content:center;gap:1rem;max-width:1160px;margin:0 auto;">
+      <a href="audit.html?site=ricks" class="grid-card">
+        <img src="images/ricks.jpeg" alt="Rick's Diner"><div class="grid-card-title">Rick's Diner – Cowley Road</div>
+      </a>
+      <a href="audit.html?site=phillys1" class="grid-card">
+        <img src="images/phillys.png" alt="Philly's Burger"><div class="grid-card-title">Philly's Burger</div>
+      </a>
+      <a href="audit.html?site=phillys2" class="grid-card">
+        <img src="images/phillys.png" alt="Philly's Burger 2"><div class="grid-card-title">Philly's Burger 2</div>
+      </a>
+      <a href="audit.html?site=rickscafe" class="grid-card">
+        <img src="images/ricks.jpeg" alt="Rick's Cafe"><div class="grid-card-title">Rick's Cafe</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="logout"><button id="logout-btn">Logout</button></div>
+
+  <script>
+    (function(){ 
+      if (!sessionStorage.getItem('loggedIn')) { document.body.style.display='none'; window.location.href='index.html'; return; }
+      document.body.style.display='block';
+    })();
+
+    const AUDITOR_PIN = "1357"; // TODO: change as needed
+
+    function checkAPin(e){ 
+      e.preventDefault();
+      const val = document.getElementById('apin').value.trim();
+      const err = document.getElementById('apin-error');
+      if(val === AUDITOR_PIN){ 
+        document.getElementById('apin-box').style.display='none';
+        document.getElementById('auditor-sites').style.display='block';
+        err.textContent='';
+      } else { 
+        err.textContent = "Incorrect PIN.";
+      }
+      return false;
+    }
+
+    document.getElementById('logout-btn').addEventListener('click', ()=>{ 
+      sessionStorage.removeItem('loggedIn');
+      sessionStorage.removeItem('userName');
+      sessionStorage.removeItem('userEmail');
+      sessionStorage.removeItem('userBusiness');
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>
