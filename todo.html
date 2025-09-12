@@ -7,58 +7,27 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
   <style>
-    /* === 50/50 split with a thin vertical line (center) === */
-    /* === 50/50 split with a persistent thin vertical divider === */
-    .twocol{
-    max-width:1160px;
-    margin:1.2rem auto;
-    display:grid;
-    grid-template-columns: 1fr 1px 1fr;  /* left | line | right */
-    gap:1rem;
-    align-items:stretch;
-    }
-    .vline{
-    width:1px;
-    height:auto;                 /* stretches with tallest column */
-    background:#000;
-    opacity:.6;
-    }
-
-    .list-col { min-height: 60vh; }
-    .list-title { font-weight: 800; color: #000; text-align: center; margin: .25rem 0 .5rem 0; }
-
-    /* Task cards match your white tiles */
-    .task {
-      background: #fff; border-radius: 16px; padding: 12px;
-      box-shadow: 0 10px 24px rgba(0,0,0,.15); margin: 0 0 .75rem 0;
-      user-select: none; cursor: pointer;
-    }
+    /* Desktop: 50/50 with vertical hairline */
+    .twocol{ max-width:1160px; margin:1.2rem auto; display:grid; grid-template-columns:1fr 1px 1fr; gap:1rem; align-items:stretch; }
+    .vline{ width:1px; height:auto; background:#000; opacity:.6; }
+    .list-col{ min-height:60vh; }
+    .list-title{ font-weight:800; color:#000; text-align:center; margin:.25rem 0 .5rem 0; }
+    .task{ background:#fff; border-radius:16px; padding:12px; box-shadow:0 10px 24px rgba(0,0,0,.15); margin:0 0 .75rem 0; user-select:none; cursor:pointer; }
     .task-head{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; }
     .task-title{ font-weight:800; color:#000; }
-    .badge { font-size: .85rem; padding: .15rem .5rem; border-radius: 999px; background:#eaeaea; color:#000; white-space:nowrap; }
+    .badge{ font-size:.85rem; padding:.15rem .5rem; border-radius:999px; background:#eaeaea; color:#000; white-space:nowrap; }
     .badge.warn{ background:#ffe0e0; }
-    .meta { margin-top: .4rem; font-size: .9rem; color:#333; }
-    .meta .who { font-weight: 700; }
-    .meta .date { opacity:.8; }
-    .empty {
-      opacity: .7; background: #f5f5f5; border: 1px dashed #ccc;
-      padding: 14px; border-radius: 12px; text-align: center; font-weight: 600;
-    }
-
-    /* Mobile: stack columns, keep the divider as a horizontal line */
-    @media (max-width: 720px){
-    .twocol{
-        grid-template-columns: 1fr;      /* one column */
-        grid-template-rows: auto 1px auto; /* todo | line | completed */
-        gap:0.9rem;                       /* gap above & below the divider */
-    }
-    .vline{
-        width:100%;
-        height:1px !important;           /* thin horizontal hairline */
-        margin: .2rem 0;                  /* small extra breathing room */
-    }
+    .meta{ margin-top:.4rem; font-size:.9rem; color:#333; }
+    .meta .who{ font-weight:700; }
+    .meta .date{ opacity:.8; }
+    .empty{ opacity:.7; background:#f5f5f5; border:1px dashed #ccc; padding:14px; border-radius:12px; text-align:center; font-weight:600; }
+    /* Mobile: stack todo | line | completed */
+    @media (max-width:720px){
+      .twocol{ grid-template-columns:1fr; grid-template-rows:auto 1px auto; gap:.9rem; }
+      .vline{ width:100%; height:1px !important; margin:.2rem 0; }
+      .task{ padding:10px; }
+      .task-title{ font-size:.95rem; }
     }
   </style>
 </head>
@@ -67,20 +36,15 @@
     <h1 class="hero-title"><strong>Nothing to do? List</strong></h1>
   </div>
   <div class="welcome-banner" style="width:100%;max-width:1160px;margin:0 auto .5rem auto;text-align:center;">
-    <p style="margin:.25rem 0;font-weight:600;color:#000;">Hey, <span id="welcome-name">User</span></p>
+    <p style="margin:.25rem 0;font-weight:600;color:#000;">Welcome, <span id="welcome-name">User</span></p>
   </div>
 
   <div class="twocol">
-    <!-- LEFT: To-Do -->
     <div class="list-col" id="todo-col">
       <div class="list-title">To-Do</div>
       <div id="todo-list"></div>
     </div>
-
-    <!-- Center thin line -->
     <div class="vline"></div>
-
-    <!-- RIGHT: Completed -->
     <div class="list-col" id="done-col">
       <div class="list-title">Completed</div>
       <div id="done-list"></div>
@@ -90,7 +54,7 @@
   <div class="logout"><button id="logout-btn">Logout</button></div>
 
   <script>
-    // ===== Basic session & welcome =====
+    // ===== Session & welcome =====
     (function(){
       if (!sessionStorage.getItem('loggedIn')) { document.body.style.display='none'; window.location.href='index.html'; return; }
       document.body.style.display='block';
@@ -98,122 +62,101 @@
       const wn = document.getElementById('welcome-name'); if (wn) wn.textContent = n;
     })();
 
-    // ====== Per-business tasks (now supports per-task "days") =================
-    // Key must match the dashboard filename WITHOUT .html
-    // Example durations mixed: some 2 days, others 7 or 14
-    const TASKS = {
-      "ricks-diner": [
-        { id:"deep-clean-drains",  title:"Deep clean drains",                 days:7 },
-        { id:"descale-kettle",     title:"Descale kettle & urn",             days:14 },
-        { id:"clean-extractor",    title:"Clean extractor hood filters",     days:7 },
-        { id:"sanitize-cutting",   title:"Sanitize cutting boards",          days:2 },   // 2 days
-        { id:"check-firstaid",     title:"Check first aid kit & dates",      days:7 }
-      ],
-      "phillys-cowley": [
-        { id:"freezer-defrost",    title:"Defrost & clean freezer",          days:14 },
-        { id:"descale-dishwasher", title:"Descale dishwasher",               days:7 },
-        { id:"label-shelf",        title:"Refresh shelf/date labels",        days:2 }    // 2 days
-      ],
-      "phillys-stclements": [
-        { id:"oven-clean",         title:"Clean ovens (inside & trays)",     days:7 },
-        { id:"check-thermometers", title:"Check & sanitize thermometers",    days:2 }    // 2 days
-      ],
-      "stclaire-valentine": [
-        { id:"wipe-seals",         title:"Wipe fridge door seals",           days:2 },   // 2 days
-        { id:"stock-rotation",     title:"Full stock rotation check",        days:7 }
-      ]
-    };
+    // ===== REMOTE CONFIG: set these two =====
+    const TASKS_API_URL   = "https://script.google.com/macros/s/AKfycbzs1ogWtG6BvIms9BR7-SqE4Eqg9qpBxZ1QOa4WMC3wTf7fG-DvoAH71bFsX7CPhrgv7A/exec"; // e.g. https://script.google.com/macros/s/AKfyc.../exec
+    const TASKS_SECRET    = "b7f2c9d8e1a44f0f8f6c1a0b3e9d7c54";   // same as Script property WEBHOOK_SECRET
 
-    // ====== Optional Google Sheets logging ===================================
-    const SHEETS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzlJDlp4KP2faug0IZKVFSmu41wr31fZzoKBN9RzVr5pspXe27HS81RRLXY4g7JXQ6U/exec"; // put your Apps Script web app URL here if you want logging
-    async function logToSheets(payload){
-    if (!SHEETS_WEB_APP_URL) return;
-    try {
-        await fetch(SHEETS_WEB_APP_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Webhook-Secret': DgRFY89aZXwjLHPw08LgAIzaSyBI0KCKvUjzJxu        // <— this must match Script Property
-        },
-        body: JSON.stringify(payload),
-        mode: 'cors',
-        keepalive: true
-        });
-    } catch(e) { /* ignore network errors */ }
-    }
+    // (optional) logging (re-use same endpoint/secret as your logger)
+    const SHEETS_WEB_APP_URL = TASKS_API_URL;  // same app handles POST
+    const LOG_SECRET         = TASKS_SECRET;
 
-    // ====== Core logic (per-task durations) ==================================
+    // ===== Core vars =====
     const DAY_MS = 24*60*60*1000;
     const businessFile = (sessionStorage.getItem('userBusiness') || '').replace(/\.html$/,'');
-    const tasksForBiz  = TASKS[businessFile] || [];
-    const userName = sessionStorage.getItem('userName') || 'Unknown';
+    const userName     = sessionStorage.getItem('userName') || 'Unknown';
 
-    const KEY_PREFIX = 'todo:v2'; // bump version because we added per-task durations
+    const KEY_PREFIX = 'todo:v3'; // version bump (now remote tasks)
     const keyFor = (tid) => `${KEY_PREFIX}:${businessFile}:${tid}`;
+    const CACHE_KEY = `task-cache:${businessFile}`;
 
-    function getTaskMeta(tid){ return tasksForBiz.find(t => t.id === tid) || { days:7 }; }
-    function getPeriodMs(tid){ const d = Number(getTaskMeta(tid).days) || 7; return d * DAY_MS; }
-
-    // DOM
     const todoList = document.getElementById('todo-list');
     const doneList = document.getElementById('done-list');
 
-    // Build nodes
-    const nodes = {};
-    tasksForBiz.forEach(t => {
-      const el = document.createElement('div');
-      el.className = 'task';
-      el.dataset.tid = t.id;
-      el.innerHTML = `
-        <div class="task-head">
-          <div class="task-title">${t.title}</div>
-          <span class="badge"></span>
-        </div>
-        <div class="meta"></div>
-      `;
-      nodes[t.id] = el;
-
-      // Click -> complete
-      el.addEventListener('click', () => handleComplete(t.id));
-
-      // Long-press (2s) on completed -> undo
-      let pressTimer = null;
-      el.addEventListener('pointerdown', () => {
-        if (!isCompleted(t.id)) return;
-        pressTimer = setTimeout(() => handleUndo(t.id), 2000);
-      });
-      ['pointerup','pointerleave','pointercancel'].forEach(ev =>
-        el.addEventListener(ev, () => { if (pressTimer){ clearTimeout(pressTimer); pressTimer=null; }})
-      );
-    });
-
-    // State helpers
-    function getState(tid){
-      try { return JSON.parse(localStorage.getItem(keyFor(tid))) || null; }
-      catch(_) { return null; }
+    // ===== Fetch tasks from Google Sheets =====
+    async function fetchTasks(){
+      const url = new URL(TASKS_API_URL);
+      url.searchParams.set('business', businessFile);
+      const res = await fetch(url.toString(), { headers: {'X-Webhook-Secret': TASKS_SECRET} });
+      if (!res.ok) throw new Error('tasks fetch failed');
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'bad response');
+      return data.tasks || [];
     }
+
+    function cacheTasks(tasks){
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(), tasks})); } catch(_) {}
+    }
+    function readCachedTasks(){
+      try {
+        const obj = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+        return Array.isArray(obj.tasks) ? obj.tasks : [];
+      } catch(_) { return []; }
+    }
+
+    // ===== DOM task nodes (built after we know the tasks) =====
+    const nodes = {};
+    let tasksForBiz = [];
+
+    function buildNodes(){
+      todoList.innerHTML = ''; doneList.innerHTML = '';
+      for (const t of tasksForBiz){
+        const el = document.createElement('div');
+        el.className = 'task';
+        el.dataset.tid = t.id;
+        el.innerHTML = `
+          <div class="task-head">
+            <div class="task-title">${t.title}</div>
+            <span class="badge"></span>
+          </div>
+          <div class="meta"></div>
+        `;
+        // click => complete
+        el.addEventListener('click', () => handleComplete(t.id));
+        // long-press => undo (only when completed)
+        let pressTimer = null;
+        el.addEventListener('pointerdown', () => {
+          if (!isCompleted(t.id)) return;
+          pressTimer = setTimeout(() => handleUndo(t.id), 2000);
+        });
+        ['pointerup','pointerleave','pointercancel'].forEach(ev =>
+          el.addEventListener(ev, () => { if (pressTimer){ clearTimeout(pressTimer); pressTimer=null; }})
+        );
+        nodes[t.id] = el;
+      }
+    }
+
+    // ===== State helpers =====
+    function getTaskMeta(tid){ return tasksForBiz.find(t => t.id === tid) || {days:7, title:tid}; }
+    function getPeriodMs(tid){ const d = Number(getTaskMeta(tid).days) || 7; return d * DAY_MS; }
+
+    function getState(tid){ try { return JSON.parse(localStorage.getItem(keyFor(tid))||'null'); } catch(_) { return null; } }
     function setState(tid, st){ localStorage.setItem(keyFor(tid), JSON.stringify(st)); }
     function clearState(tid){ localStorage.removeItem(keyFor(tid)); }
     function isCompleted(tid){ return !!getState(tid)?.completedAt; }
 
     function msUntilReturn(tid){
       const st = getState(tid); if (!st) return null;
-      const dueAt = new Date(st.completedAt).getTime() + getPeriodMs(tid);
-      return dueAt - Date.now();
+      return new Date(st.completedAt).getTime() + getPeriodMs(tid) - Date.now();
     }
-    function daysUntilReturn(tid){
-      const ms = msUntilReturn(tid); if (ms === null) return null;
-      return Math.ceil(ms / DAY_MS);
-    }
+    function daysUntilReturn(tid){ const ms = msUntilReturn(tid); return ms==null ? null : Math.ceil(ms/DAY_MS); }
     function overdueDays(tid){
-      const ms = msUntilReturn(tid); if (ms === null) return 0;
+      const ms = msUntilReturn(tid); if (ms==null) return 0;
       if (ms > 0) return 0;
-      return Math.floor((-ms) / DAY_MS) + 1; // "due 1 day ago" starts the day it passes
+      return Math.floor((-ms)/DAY_MS) + 1;
     }
 
-    // Place + badges
     function placeTask(tid){
-      const el = nodes[tid];
+      const el = nodes[tid]; if (!el) return;
       const st = getState(tid);
       const badge = el.querySelector('.badge');
       const meta  = el.querySelector('.meta');
@@ -226,14 +169,12 @@
 
       const od = overdueDays(tid);
       if (od > 0) {
-        // Overdue → back to To-Do automatically (and show overdue & last done)
         clearState(tid);
         badge.textContent = `due ${od} day${od>1?'s':''} ago`;
         badge.classList.add('warn');
         meta.textContent = st.by ? `Last done by ${st.by} on ${new Date(st.completedAt).toLocaleDateString()}` : '';
         todoList.appendChild(el);
       } else {
-        // Still within period → Completed
         const left = daysUntilReturn(tid);
         const d = Number(getTaskMeta(tid).days) || 7;
         badge.textContent = left ? `returns in ${left} / ${d} day${d>1?'s':''}` : `returns today`;
@@ -250,53 +191,69 @@
       const state = { completedAt: new Date().toISOString(), by: userName };
       setState(tid, state);
       placeTask(tid);
-      logToSheets({
-        action:'complete', business:businessFile, taskId:tid,
-        taskTitle:getTaskMeta(tid).title || tid, by:userName, at:state.completedAt,
-        days:getTaskMeta(tid).days || 7
-      });
+      logToSheets({ action:'complete', business:businessFile, taskId:tid,
+        taskTitle:getTaskMeta(tid).title, by:userName, at:state.completedAt, days:getTaskMeta(tid).days });
     }
 
     function handleUndo(tid){
       const prev = getState(tid);
       clearState(tid);
       placeTask(tid);
-      logToSheets({
-        action:'undo', business:businessFile, taskId:tid,
-        taskTitle:getTaskMeta(tid).title || tid, by:userName,
-        at:new Date().toISOString(), prevCompletedAt: prev?.completedAt || null
-      });
+      logToSheets({ action:'undo', business:businessFile, taskId:tid,
+        taskTitle:getTaskMeta(tid).title, by:userName, at:new Date().toISOString(), prevCompletedAt:prev?.completedAt || null });
     }
 
-    // Sort To-Do by urgency: most overdue first, then longest since last completed
     function sortTodo(){
       const cards = Array.from(todoList.children);
       cards.sort((a,b)=>{
         const ta=a.dataset.tid, tb=b.dataset.tid;
         const oa = overdueDays(ta), ob = overdueDays(tb);
-        if (ob !== oa) return ob - oa; // more overdue first
+        if (ob !== oa) return ob - oa;
         const sa = getState(ta), sb = getState(tb);
-        const ea = sa ? Date.now() - new Date(sa.completedAt).getTime() : 0;
-        const eb = sb ? Date.now() - new Date(sb.completedAt).getTime() : 0;
-        return eb - ea; // older completion first
+        const ea = sa ? Date.now()-new Date(sa.completedAt).getTime() : 0;
+        const eb = sb ? Date.now()-new Date(sb.completedAt).getTime() : 0;
+        return eb - ea;
       });
       cards.forEach(c => todoList.appendChild(c));
     }
 
-    function renderAll(){
-      if (tasksForBiz.length === 0){
+    async function init(){
+      try {
+        const tasks = await fetchTasks();
+        tasksForBiz = tasks;
+        cacheTasks(tasks);
+      } catch {
+        tasksForBiz = readCachedTasks();
+      }
+      if (!tasksForBiz || tasksForBiz.length === 0){
         todoList.innerHTML = `<div class="empty">No tasks configured for this business yet.</div>`;
         doneList.innerHTML = '';
         return;
       }
-      todoList.innerHTML = ''; doneList.innerHTML = '';
+      // normalize numbers
+      tasksForBiz = tasksForBiz.map(t => ({...t, days: Number(t.days)||7}));
+      buildNodes();
       tasksForBiz.forEach(t => placeTask(t.id));
       sortTodo();
     }
-    renderAll();
+    init();
 
-    // Refresh every minute to update countdowns / auto-return
-    setInterval(()=>{ tasksForBiz.forEach(t => placeTask(t.id)); sortTodo(); }, 60*1000);
+    // refresh every minute (for countdowns/auto-returns)
+    setInterval(()=>{ if (tasksForBiz) { tasksForBiz.forEach(t => placeTask(t.id)); sortTodo(); } }, 60*1000);
+
+    // logging to sheet (optional)
+    async function logToSheets(payload){
+      if (!SHEETS_WEB_APP_URL) return;
+      try {
+        await fetch(SHEETS_WEB_APP_URL, {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json', 'X-Webhook-Secret': LOG_SECRET },
+          body: JSON.stringify(payload),
+          mode:'cors',
+          keepalive:true
+        });
+      } catch(e){}
+    }
 
     // logout
     document.getElementById('logout-btn').addEventListener('click', () => {
@@ -304,7 +261,7 @@
     });
   </script>
 
-  <!-- Shared inactivity timer & protections -->
+  <!-- shared inactivity protections -->
   <script src="disposal.js" defer></script>
 </body>
 </html>
