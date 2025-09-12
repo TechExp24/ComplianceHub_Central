@@ -35,14 +35,13 @@
   <div class="header2">
     <h1 class="hero-title"><strong>Nothing to do? List</strong></h1>
   </div>
-  <div class="welcome-banner" style="width:100%;max-width:1160px;margin:0 auto .5rem auto;text-align:center;">
-    <p style="margin:.25rem 0;font-weight:600;color:#000;">Welcome, <span id="welcome-name">User</span></p>
-  </div>
-
   <!-- Sync control row -->
   <div style="max-width:1160px;margin:0 auto .25rem auto;display:flex;justify-content:flex-end;gap:.5rem;align-items:center;">
     <button id="sync-btn" class="btn" style="padding:.35rem .6rem;border-radius:10px;">Sync</button>
     <span id="sync-status" style="font-size:.85rem;opacity:.7;"></span>
+  </div>
+  <div class="welcome-banner" style="width:100%;max-width:1160px;margin:0 auto .5rem auto;text-align:center;">
+    <p style="margin:.25rem 0;font-weight:600;color:#000;">Welcome, <span id="welcome-name">User</span></p>
   </div>
 
   <div class="twocol">
@@ -71,9 +70,9 @@
       const wn = document.getElementById('welcome-name'); if (wn) wn.textContent = n;
     })();
 
-    // ===== REMOTE CONFIG: set these to your Apps Script web app =====
-    const TASKS_API_URL = "https://script.google.com/macros/s/AKfycbzs1ogWtG6BvIms9BR7-SqE4Eqg9qpBxZ1QOa4WMC3wTf7fG-DvoAH71bFsX7CPhrgv7A/exec"; // e.g. https://script.google.com/macros/s/AKfyc.../exec
-    const TASKS_SECRET  = "b7f2c9d8e1a44f0f8f6c1a0b3e9d7c54";   // same as Script property WEBHOOK_SECRET
+    // ===== REMOTE CONFIG: your Apps Script web app =====
+    const TASKS_API_URL = "https://script.google.com/macros/s/AKfycbzs1ogWtG6BvIms9BR7-SqE4Eqg9qpBxZ1QOa4WMC3wTf7fG-DvoAH71bFsX7CPhrgv7A/exec";
+    const TASKS_SECRET  = "b7f2c9d8e1a44f0f8f6c1a0b3e9d7c54";
 
     // Re-use same endpoint for logging (POST)
     const SHEETS_WEB_APP_URL = TASKS_API_URL;
@@ -84,7 +83,7 @@
     const businessFile = (sessionStorage.getItem('userBusiness') || '').replace(/\.html$/,'');
     const userName     = sessionStorage.getItem('userName') || 'Unknown';
 
-    const KEY_PREFIX = 'todo:v3'; // version for local state
+    const KEY_PREFIX = 'todo:v3';
     const keyFor = (tid) => `${KEY_PREFIX}:${businessFile}:${tid}`;
     const CACHE_KEY = `task-cache:${businessFile}`;
 
@@ -95,14 +94,16 @@
 
     function setSyncStatus(msg){ if(syncStatus) syncStatus.textContent = msg; }
 
-    // ===== Fetch tasks from Google Sheets (GET) =====
+    // ===== Fetch tasks from Google Sheets (no preflight) =====
     async function fetchTasks(){
       const url = new URL(TASKS_API_URL);
       url.searchParams.set('business', businessFile);
-      url.searchParams.set('_', Date.now()); // cache-bust
+      url.searchParams.set('key', TASKS_SECRET);   // secret in query to avoid preflight
+      url.searchParams.set('_', Date.now());       // cache-bust
       const res = await fetch(url.toString(), {
-        headers: { 'X-Webhook-Secret': TASKS_SECRET },
-        cache: 'no-store'
+        cache: 'no-store',
+        mode: 'cors',
+        credentials: 'omit'
       });
       if (!res.ok) throw new Error('tasks fetch failed');
       const data = await res.json();
@@ -240,7 +241,7 @@
         const tasks = await fetchTasks();
         tasksForBiz = tasks.map(t => ({...t, days: Number(t.days)||7}));
         cacheTasks(tasksForBiz);
-        setSyncStatus(''); // clear
+        setSyncStatus('');
       } catch {
         tasksForBiz = readCachedTasks();
         setSyncStatus(tasksForBiz.length ? 'Offline – using cached tasks' : 'No tasks available');
@@ -266,7 +267,6 @@
         const tasks = await fetchTasks();
         tasksForBiz = tasks.map(t => ({...t, days: Number(t.days)||7}));
         cacheTasks(tasksForBiz);
-        // rebuild UI from fresh tasks
         Object.keys(nodes).forEach(k => delete nodes[k]);
         buildNodes();
         tasksForBiz.forEach(t => placeTask(t.id));
@@ -287,22 +287,25 @@
         }
       }
     }
-    if (syncBtn) syncBtn.addEventListener('click', refreshTasks);
-    setInterval(refreshTasks, 5 * 60 * 1000); // every 5 minutes
+    document.getElementById('sync-btn').addEventListener('click', refreshTasks);
+    setInterval(refreshTasks, 5 * 60 * 1000);
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') refreshTasks();
     });
 
-    // Logging to sheet (optional)
+    // Logging to sheet (POST ?key=... + text/plain to avoid preflight)
     async function logToSheets(payload){
       if (!SHEETS_WEB_APP_URL) return;
       try {
-        await fetch(SHEETS_WEB_APP_URL, {
+        const url = new URL(SHEETS_WEB_APP_URL);
+        url.searchParams.set('key', LOG_SECRET);
+        await fetch(url.toString(), {
           method:'POST',
-          headers:{ 'Content-Type':'application/json', 'X-Webhook-Secret': LOG_SECRET },
+          headers:{ 'Content-Type':'text/plain' },
           body: JSON.stringify(payload),
           mode:'cors',
-          keepalive:true
+          keepalive:true,
+          credentials:'omit'
         });
       } catch(e){}
     }
@@ -317,4 +320,3 @@
   <script src="disposal.js" defer></script>
 </body>
 </html>
-
