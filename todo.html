@@ -39,12 +39,21 @@
     <p style="margin:.25rem 0;font-weight:600;color:#000;">Welcome, <span id="welcome-name">User</span></p>
   </div>
 
+  <!-- Sync control row -->
+  <div style="max-width:1160px;margin:0 auto .25rem auto;display:flex;justify-content:flex-end;gap:.5rem;align-items:center;">
+    <button id="sync-btn" class="btn" style="padding:.35rem .6rem;border-radius:10px;">Sync</button>
+    <span id="sync-status" style="font-size:.85rem;opacity:.7;"></span>
+  </div>
+
   <div class="twocol">
+    <!-- LEFT: To-Do -->
     <div class="list-col" id="todo-col">
       <div class="list-title">To-Do</div>
       <div id="todo-list"></div>
     </div>
+    <!-- Center thin line -->
     <div class="vline"></div>
+    <!-- RIGHT: Completed -->
     <div class="list-col" id="done-col">
       <div class="list-title">Completed</div>
       <div id="done-list"></div>
@@ -62,12 +71,12 @@
       const wn = document.getElementById('welcome-name'); if (wn) wn.textContent = n;
     })();
 
-    // ===== REMOTE CONFIG: set these two =====
-    const TASKS_API_URL   = "https://script.google.com/macros/s/AKfycbzs1ogWtG6BvIms9BR7-SqE4Eqg9qpBxZ1QOa4WMC3wTf7fG-DvoAH71bFsX7CPhrgv7A/exec"; // e.g. https://script.google.com/macros/s/AKfyc.../exec
-    const TASKS_SECRET    = "b7f2c9d8e1a44f0f8f6c1a0b3e9d7c54";   // same as Script property WEBHOOK_SECRET
+    // ===== REMOTE CONFIG: set these to your Apps Script web app =====
+    const TASKS_API_URL = "https://script.google.com/macros/s/AKfycbzs1ogWtG6BvIms9BR7-SqE4Eqg9qpBxZ1QOa4WMC3wTf7fG-DvoAH71bFsX7CPhrgv7A/exec"; // e.g. https://script.google.com/macros/s/AKfyc.../exec
+    const TASKS_SECRET  = "b7f2c9d8e1a44f0f8f6c1a0b3e9d7c54";   // same as Script property WEBHOOK_SECRET
 
-    // (optional) logging (re-use same endpoint/secret as your logger)
-    const SHEETS_WEB_APP_URL = TASKS_API_URL;  // same app handles POST
+    // Re-use same endpoint for logging (POST)
+    const SHEETS_WEB_APP_URL = TASKS_API_URL;
     const LOG_SECRET         = TASKS_SECRET;
 
     // ===== Core vars =====
@@ -75,18 +84,26 @@
     const businessFile = (sessionStorage.getItem('userBusiness') || '').replace(/\.html$/,'');
     const userName     = sessionStorage.getItem('userName') || 'Unknown';
 
-    const KEY_PREFIX = 'todo:v3'; // version bump (now remote tasks)
+    const KEY_PREFIX = 'todo:v3'; // version for local state
     const keyFor = (tid) => `${KEY_PREFIX}:${businessFile}:${tid}`;
     const CACHE_KEY = `task-cache:${businessFile}`;
 
-    const todoList = document.getElementById('todo-list');
-    const doneList = document.getElementById('done-list');
+    const todoList   = document.getElementById('todo-list');
+    const doneList   = document.getElementById('done-list');
+    const syncBtn    = document.getElementById('sync-btn');
+    const syncStatus = document.getElementById('sync-status');
 
-    // ===== Fetch tasks from Google Sheets =====
+    function setSyncStatus(msg){ if(syncStatus) syncStatus.textContent = msg; }
+
+    // ===== Fetch tasks from Google Sheets (GET) =====
     async function fetchTasks(){
       const url = new URL(TASKS_API_URL);
       url.searchParams.set('business', businessFile);
-      const res = await fetch(url.toString(), { headers: {'X-Webhook-Secret': TASKS_SECRET} });
+      url.searchParams.set('_', Date.now()); // cache-bust
+      const res = await fetch(url.toString(), {
+        headers: { 'X-Webhook-Secret': TASKS_SECRET },
+        cache: 'no-store'
+      });
       if (!res.ok) throw new Error('tasks fetch failed');
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || 'bad response');
@@ -103,7 +120,7 @@
       } catch(_) { return []; }
     }
 
-    // ===== DOM task nodes (built after we know the tasks) =====
+    // ===== Build UI nodes after tasks arrive =====
     const nodes = {};
     let tasksForBiz = [];
 
@@ -122,7 +139,7 @@
         `;
         // click => complete
         el.addEventListener('click', () => handleComplete(t.id));
-        // long-press => undo (only when completed)
+        // long-press => undo (when completed)
         let pressTimer = null;
         el.addEventListener('pointerdown', () => {
           if (!isCompleted(t.id)) return;
@@ -208,40 +225,75 @@
       cards.sort((a,b)=>{
         const ta=a.dataset.tid, tb=b.dataset.tid;
         const oa = overdueDays(ta), ob = overdueDays(tb);
-        if (ob !== oa) return ob - oa;
+        if (ob !== oa) return ob - oa; // more overdue first
         const sa = getState(ta), sb = getState(tb);
         const ea = sa ? Date.now()-new Date(sa.completedAt).getTime() : 0;
         const eb = sb ? Date.now()-new Date(sb.completedAt).getTime() : 0;
-        return eb - ea;
+        return eb - ea; // older completion first
       });
       cards.forEach(c => todoList.appendChild(c));
     }
 
     async function init(){
       try {
+        setSyncStatus('Loading…');
         const tasks = await fetchTasks();
-        tasksForBiz = tasks;
-        cacheTasks(tasks);
+        tasksForBiz = tasks.map(t => ({...t, days: Number(t.days)||7}));
+        cacheTasks(tasksForBiz);
+        setSyncStatus(''); // clear
       } catch {
         tasksForBiz = readCachedTasks();
+        setSyncStatus(tasksForBiz.length ? 'Offline – using cached tasks' : 'No tasks available');
       }
       if (!tasksForBiz || tasksForBiz.length === 0){
         todoList.innerHTML = `<div class="empty">No tasks configured for this business yet.</div>`;
         doneList.innerHTML = '';
         return;
       }
-      // normalize numbers
-      tasksForBiz = tasksForBiz.map(t => ({...t, days: Number(t.days)||7}));
       buildNodes();
       tasksForBiz.forEach(t => placeTask(t.id));
       sortTodo();
     }
     init();
 
-    // refresh every minute (for countdowns/auto-returns)
+    // Update countdowns every minute
     setInterval(()=>{ if (tasksForBiz) { tasksForBiz.forEach(t => placeTask(t.id)); sortTodo(); } }, 60*1000);
 
-    // logging to sheet (optional)
+    // Manual + auto sync
+    async function refreshTasks(){
+      try{
+        setSyncStatus('Syncing…');
+        const tasks = await fetchTasks();
+        tasksForBiz = tasks.map(t => ({...t, days: Number(t.days)||7}));
+        cacheTasks(tasksForBiz);
+        // rebuild UI from fresh tasks
+        Object.keys(nodes).forEach(k => delete nodes[k]);
+        buildNodes();
+        tasksForBiz.forEach(t => placeTask(t.id));
+        sortTodo();
+        const now = new Date();
+        setSyncStatus(`Updated ${now.toLocaleTimeString()}`);
+      }catch(e){
+        setSyncStatus('Offline – using cached tasks');
+        if (!tasksForBiz || tasksForBiz.length === 0){
+          tasksForBiz = readCachedTasks();
+          if (tasksForBiz.length){
+            tasksForBiz = tasksForBiz.map(t => ({...t, days: Number(t.days)||7}));
+            Object.keys(nodes).forEach(k => delete nodes[k]);
+            buildNodes();
+            tasksForBiz.forEach(t => placeTask(t.id));
+            sortTodo();
+          }
+        }
+      }
+    }
+    if (syncBtn) syncBtn.addEventListener('click', refreshTasks);
+    setInterval(refreshTasks, 5 * 60 * 1000); // every 5 minutes
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') refreshTasks();
+    });
+
+    // Logging to sheet (optional)
     async function logToSheets(payload){
       if (!SHEETS_WEB_APP_URL) return;
       try {
@@ -261,7 +313,8 @@
     });
   </script>
 
-  <!-- shared inactivity protections -->
+  <!-- shared inactivity protections / PIN logic -->
   <script src="disposal.js" defer></script>
 </body>
 </html>
+
