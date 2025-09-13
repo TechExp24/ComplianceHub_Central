@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    /* Force grid like Tutorials (independent of external CSS) */
+    /* Force grid like Tutorials */
     .audit-grid{
       display:grid !important;
       grid-template-columns: repeat(3, minmax(280px, 1fr));
@@ -19,10 +19,9 @@
     @media (max-width: 980px){ .audit-grid{ grid-template-columns: repeat(2, minmax(240px, 1fr)); } }
     @media (max-width: 560px){ .audit-grid{ grid-template-columns: 1fr; } }
 
-    /* Optional: make the cards breathe a bit (uses your existing .grid-card) */
-    .grid-card { display:block; }
+    .grid-card { display:block; border-radius:14px; overflow:hidden; box-shadow:0 10px 24px rgba(0,0,0,.12); background:#f8f8f8; }
     .grid-card img { width:100%; height:auto; display:block; }
-    .grid-card-title { text-align:center; font-weight:800; color:#000; padding:.5rem 0 0; }
+    .grid-card-title { text-align:center; font-weight:800; color:#000; padding:.6rem .5rem .9rem; }
   </style>
 </head>
 <body class="form-dashboard" style="display:none">
@@ -40,9 +39,9 @@
     <label for="siteSel" style="font-weight:600;color:#000">Switch Site:</label>
     <select id="siteSel" style="padding:.5rem;border-radius:6px;border:1px solid #ccc;">
       <option value="ricks">Rick's Diner – Cowley Road</option>
-      <option value="phillys1">Philly's Burger</option>
-      <option value="phillys2">Philly's Burger 2</option>
-      <option value="rickscafe">Rick's Cafe</option>
+      <option value="phillysCowley">Philly's Burger – Cowley</option>
+      <option value="phillysStClements">Philly's Burger – St Clements</option>
+      <option value="stClaireValentine">St Claire – Valentine</option>
     </select>
   </div>
 
@@ -60,45 +59,49 @@
       var wn = document.getElementById('welcome-name'); if (wn) wn.textContent = n;
     })();
 
-    // --- Data (replace '#' with your real Google Form URLs) ---
+    // --- Live Google Forms per business ---
     const AUDIT_FORMS = {
       ricks: [
-        { title: "Food Safety Audit", href: "#" },
-        { title: "Cleaning Standards Audit", href: "#" },
-        { title: "Documentation Check", href: "#" },
-        { title: "Equipment & Maintenance", href: "#" }
+        { title: "Food Safety",               href: "https://docs.google.com/forms/d/e/1FAIpQLSdC_rc0XQwI5AUmd3jj--o05DDT29o4mfdSmeAHB1V64uhCFw/viewform" },
+        { title: "Cleaning Standards",       href: "https://docs.google.com/forms/d/e/1FAIpQLSeEzErx91BT0a3x34iEcr6rZ7HcxOuFLYauUdCWz6keOf3P9A/viewform" },
+        { title: "Documentation & Records",  href: "https://docs.google.com/forms/d/e/1FAIpQLSc4hIoFq4PEkGLEqjgEXDJLLJNUq2tss_3W20WW1NjChDbMMQ/viewform" },
+        { title: "Equipment & Maintenance",  href: "https://docs.google.com/forms/d/e/1FAIpQLSdpuaVy9Xvh94gsjQVjd2JRI2ZfYTOwkB69tGOjiL9a2latuA/viewform" },
+        { title: "Deep Cleaning Checklist",  href: "https://docs.google.com/forms/d/e/1FAIpQLSfV7KCOVLx_r5N1eAB3mbL-pvqukl25Tj-6rm1RVAaHVlkz1A/viewform" }
       ],
-      phillys1: [
-        { title: "Food Safety Audit", href: "#" },
-        { title: "Front-of-House Standards", href: "#" },
-        { title: "Back-of-House Hygiene", href: "#" },
-        { title: "Temperature Logs Review", href: "#" }
+      phillysCowley: [
+        { title: "Food Safety",               href: "https://docs.google.com/forms/d/e/1FAIpQLSeZAEcXOCnsc-1I0VB_Usl3vRYL_M6dla7EH_dixw7zPw_JKQ/viewform" },
+        { title: "Cleaning Standards",       href: "https://docs.google.com/forms/d/e/1FAIpQLSevLcm_40Qmt8YSNBhIi71_HVwyx056QPwlJXqfVQcrfnmW3w/viewform" },
+        { title: "Documentation & Records",  href: "https://docs.google.com/forms/d/e/1FAIpQLSccZAt3x3MxX6Kqkjg01gpPcOjGQ-yAdBeqyr2hYl-ljyPiWg/viewform" },
+        { title: "Equipment & Maintenance",  href: "https://docs.google.com/forms/d/e/1FAIpQLScqJmnRad-5TpACpqy9JHWrkc2wIUiZ-zNU4bdNwd_RO2u3SQ/viewform" },
+        { title: "Deep Cleaning Checklist",  href: "https://docs.google.com/forms/d/e/1FAIpQLSciQG5b8-qiJ0n-PrnIyOLPleKMZlIs_HVSpjAf3J1LE2halg/viewform" }
       ],
-      phillys2: [
-        { title: "Kitchen Hygiene Audit", href: "#" },
-        { title: "Service Standards", href: "#" },
-        { title: "Waste & Traceability", href: "#" },
-        { title: "Maintenance Walkthrough", href: "#" }
+      phillysStClements: [
+        { title: "Food Safety",               href: "https://docs.google.com/forms/d/e/1FAIpQLScRblV5MV-OegZLLQbjk0LPSh_b__-_BDwJ141KQgM6uZJNfw/viewform" },
+        { title: "Cleaning Standards",       href: "https://docs.google.com/forms/d/e/1FAIpQLSfLEak5bJ9AdOe2XUs_P9EQZsFG5PTO3wcMz3ugnfIqpRlWEw/viewform" },
+        { title: "Documentation & Records",  href: "https://docs.google.com/forms/d/e/1FAIpQLSdtJdqzc9VuUjuKROtSrP3b1G2jkwc-PNRB_dfPkK-Xj9qHgA/viewform" },
+        { title: "Equipment & Maintenance",  href: "https://docs.google.com/forms/d/e/1FAIpQLSe45xUO4nbqVaiLZeILAReEk3ldsAWgJYXLdLfLqpJ4qi2fbw/viewform" },
+        { title: "Deep Cleaning Checklist",  href: "https://docs.google.com/forms/d/e/1FAIpQLSfqHdRm-Pqio4pMoNEdg2go8upO1_VteCIA1mAi07zW8TsopQ/viewform" }
       ],
-      rickscafe: [
-        { title: "Daily Compliance Audit", href: "#" },
-        { title: "Pest Control Review", href: "#" },
-        { title: "Staff Training Checks", href: "#" },
-        { title: "Premises Checklist", href: "#" }
+      stClaireValentine: [
+        { title: "Food Safety",               href: "https://docs.google.com/forms/d/e/1FAIpQLSdMsFgXjb2e0hkH4XhjNKfypVyPnm9m6fnhnf_yEnPotVyKyg/viewform" },
+        { title: "Cleaning Standards",       href: "https://docs.google.com/forms/d/e/1FAIpQLSd4bOkqVpVM3_ka6nouKGTbJGs2SBCOqDcPJEvBE2se6inNCw/viewform" },
+        { title: "Documentation & Records",  href: "https://docs.google.com/forms/d/e/1FAIpQLSf2VCNDSjkeZdFSRpvQ2GTiCcHhoyGRhTOkHIyJoW7e-pmW5Q/viewform" },
+        { title: "Equipment & Maintenance",  href: "https://docs.google.com/forms/d/e/1FAIpQLScV7dEN75MD08F5osA0IW_o5s0Q1JW6IgPM2YK20xbtLSASxA/viewform" },
+        { title: "Deep Cleaning Checklist",  href: "https://docs.google.com/forms/d/e/1FAIpQLSeUBuRTr_9s48aLBmu3YYJyqvvpKbFxRA4cN_veX-iwR6PFlw/viewform" }
       ]
     };
 
     const IMAGES = {
       ricks: "images/phillys.png",
-      phillys1: "images/phillys.png",
-      phillys2: "images/phillys.png",
-      rickscafe: "images/phillys.png"
+      phillysCowley: "images/phillys.png",
+      phillysStClements: "images/phillys.png",
+      stClaireValentine: "images/phillys.png"
     };
 
     // --- Render to grid ---
     function render(site){
       const list = AUDIT_FORMS[site] || [];
-      const img = IMAGES[site] || "images/doc-thumb.jpg";
+      const img = IMAGES[site] || "images/phillys.png";
       const wrap = document.getElementById('audit-tiles');
       wrap.innerHTML = list.map(i => (
         `<a class="grid-card" target="_blank" rel="noopener" href="${i.href}">
@@ -110,10 +113,22 @@
 
     // --- Init + site switching ---
     function qs(k){ return new URLSearchParams(location.search).get(k); }
+
+    // Support old query values if any bookmarks exist:
+    const KEY_ALIASES = {
+      'phillys1': 'phillysCowley',
+      'phillys2': 'phillysStClements',
+      'rickscafe': 'stClaireValentine'
+    };
+
     const sel = document.getElementById('siteSel');
-    const start = qs('site') || 'ricks';
+    let start = qs('site') || 'ricks';
+    if (KEY_ALIASES[start]) start = KEY_ALIASES[start];
+    if (!AUDIT_FORMS[start]) start = 'ricks';
+
     sel.value = start;
     render(start);
+
     sel.addEventListener('change', function(){
       const v = sel.value;
       render(v);
@@ -131,6 +146,5 @@
       window.location.href = 'index.html';
     });
   </script>
-  <script src="disposal.js" defer></script>
 </body>
 </html>
